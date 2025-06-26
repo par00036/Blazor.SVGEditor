@@ -15,10 +15,10 @@ public partial class SVGEditor : ComponentBase
     private List<Shape>? colorPickerShapes;
     private string? colorPickerAttributeName;
     private Action<string>? colorPickerSetter;
-    private (double x, double y)? translatePanner;
-    private ((double x, double y) firstFinger, (double x, double y) secondFinger)? multiplePointerPanners;
+    protected (double x, double y)? translatePanner;
+    protected ((double x, double y) firstFinger, (double x, double y) secondFinger)? multiplePointerPanners;
     private readonly Subject<ISVGElement> elementSubject = new();
-    private List<Shape>? boxSelectionShapes;
+    protected List<Shape>? boxSelectionShapes;
     private string ColorPickerTitle => $"Pick {colorPickerAttributeName} Color";
     private bool IsColorPickerOpen => colorPickerShapes is not null;
 

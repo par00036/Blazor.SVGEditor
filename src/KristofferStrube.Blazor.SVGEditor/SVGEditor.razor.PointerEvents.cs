@@ -7,7 +7,7 @@ public partial class SVGEditor
     private bool touchUnselectHasStarted = false;
     private bool touchHasZoomed = false;
 
-    private void Move(PointerEventArgs eventArgs)
+    protected virtual void Move(PointerEventArgs eventArgs)
     {
         if (multiplePointerPanners is not null)
         {
@@ -80,22 +80,22 @@ public partial class SVGEditor
         }
     }
 
-    private static (double x, double y) Sub((double x, double y) u, (double x, double y) v)
+    protected static (double x, double y) Sub((double x, double y) u, (double x, double y) v)
     {
         return (u.x - v.x, u.y - v.y);
     }
 
-    private static double Dot((double x, double y) u, (double x, double y) v)
+    protected static double Dot((double x, double y) u, (double x, double y) v)
     {
         return (u.x * v.x) + (u.y * v.y);
     }
 
-    private static double ProjectScalar((double x, double y) u, (double x, double y) v)
+    protected static double ProjectScalar((double x, double y) u, (double x, double y) v)
     {
         return Dot(u, v) / Dot(v, v);
     }
 
-    public void Down(PointerEventArgs eventArgs)
+    public virtual void Down(PointerEventArgs eventArgs)
     {
         if (eventArgs.Button == 1)
         {
@@ -118,7 +118,7 @@ public partial class SVGEditor
         }
     }
 
-    public void Up(PointerEventArgs eventArgs)
+    public virtual void Up(PointerEventArgs eventArgs)
     {
         MoveOverShapes.Clear();
         CurrentEditShape = null;
@@ -149,7 +149,7 @@ public partial class SVGEditor
         }
     }
 
-    public void TouchStart(TouchEventArgs eventArgs)
+    public virtual void TouchStart(TouchEventArgs eventArgs)
     {
         if (eventArgs.Touches is [TouchPoint firstFinger, TouchPoint secondFinger])
         {
@@ -250,17 +250,17 @@ public partial class SVGEditor
         }
     }
 
-    private List<Shape> WindowSelection(Box box)
+    protected List<Shape> WindowSelection(Box box)
     {
         return Elements.Where(e => e is Shape).Select(e => (Shape)e).Where(s => s.SelectionPoints.All(p => PointWitinBox(p, box))).ToList();
     }
 
-    private List<Shape> CrossingSelection(Box box)
+    protected List<Shape> CrossingSelection(Box box)
     {
         return Elements.Where(e => e is Shape).Select(e => (Shape)e).Where(s => s.SelectionPoints.Any(p => PointWitinBox(p, box))).ToList();
     }
 
-    private static bool PointWitinBox((double x, double y) point, Box box)
+    protected static bool PointWitinBox((double x, double y) point, Box box)
     {
         return (box.Width, box.Height) switch
         {
