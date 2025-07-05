@@ -1,28 +1,26 @@
 ﻿@inherits ShapeEditor<Polyline>
 
 <ContextMenuTrigger MenuId="SVGMenu" WrapperTag="g" Data=@SVGElement MouseButtonTrigger="SVGElement.ShouldTriggerContextMenu ? MouseButtonTrigger.Right : (MouseButtonTrigger)4">
-    <g transform="translate(@SVGElement.SVG.Translate.x.AsString() @SVGElement.SVG.Translate.y.AsString()) scale(@SVGElement.SVG.Scale.AsString())">
-        <polyline @ref=ElementReference
-        @onfocusin="FocusElement"
-        @onfocusout="UnfocusElement"
-        @onpointerdown="SelectAsync"
-        @onkeyup="KeyUp"
-                  tabindex="@(SVGElement.IsChildElement ? -1 : 0)"
-                  points="@SVGElement.Element.GetAttributeOrEmpty("points")"
-                  fill="@SVGElement.Fill"
-                  stroke="@SVGElement.Stroke"
-                  stroke-width="@SVGElement.StrokeWidth"
-                  stroke-linecap="@SVGElement.StrokeLinecap.AsString()"
-                  stroke-linejoin="@SVGElement.StrokeLinejoin.AsString()"
-                  stroke-dasharray="@SVGElement.StrokeDasharray"
-                  stroke-dashoffset="@SVGElement.StrokeDashoffset.AsString()">
-            @foreach (BaseAnimate animate in SVGElement.AnimationElements)
-            {
-                var Parameters = new Dictionary<string, object> { { "SVGElement", animate } };
-                <DynamicComponent Type=animate.Presenter Parameters=Parameters />
-            }
-        </polyline>
-    </g>
+   <polyline @ref=ElementReference
+   @onfocusin="FocusElement"
+   @onfocusout="UnfocusElement"
+   @onpointerdown="SelectAsync"
+   @onkeyup="KeyUp"
+            tabindex="@(SVGElement.IsChildElement ? -1 : 0)"
+            points="@SVGElement.Element.GetAttributeOrEmpty("points")"
+            fill="@SVGElement.Fill"
+            stroke="@SVGElement.Stroke"
+            stroke-width="@SVGElement.StrokeWidth"
+            stroke-linecap="@SVGElement.StrokeLinecap.AsString()"
+            stroke-linejoin="@SVGElement.StrokeLinejoin.AsString()"
+            stroke-dasharray="@SVGElement.StrokeDasharray"
+            stroke-dashoffset="@SVGElement.StrokeDashoffset.AsString()">
+      @foreach (BaseAnimate animate in SVGElement.AnimationElements)
+      {
+            var Parameters = new Dictionary<string, object> { { "SVGElement", animate } };
+            <DynamicComponent Type=animate.Presenter Parameters=Parameters />
+      }
+   </polyline>
     @if (SVGElement.Selected && SVGElement.SVG.EditMode is not EditMode.Add)
     {
         @for (int i = 0; i < SVGElement.Points.Count(); i++)

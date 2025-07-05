@@ -1,31 +1,29 @@
 ﻿@inherits ShapeEditor<Rect>
 
 <ContextMenuTrigger MenuId="SVGMenu" WrapperTag="g" Data=@SVGElement MouseButtonTrigger="SVGElement.ShouldTriggerContextMenu ? MouseButtonTrigger.Right : (MouseButtonTrigger)4">
-    <g transform="translate(@SVGElement.SVG.Translate.x.AsString() @SVGElement.SVG.Translate.y.AsString()) scale(@SVGElement.SVG.Scale.AsString())">
-        <rect @ref=ElementReference
-        @onfocusin="FocusElement"
-        @onfocusout="UnfocusElement"
-        @onpointerdown="SelectAsync"
-        @onkeyup="KeyUp"
-              tabindex="@(SVGElement.IsChildElement ? -1 : 0)"
-              x=@SVGElement.X.AsString()
-              y=@SVGElement.Y.AsString()
-              width=@SVGElement.Width.AsString()
-              height=@SVGElement.Height.AsString()
-              stroke="@SVGElement.Stroke"
-              stroke-width="@SVGElement.StrokeWidth"
-              stroke-linecap="@SVGElement.StrokeLinecap.AsString()"
-              stroke-linejoin="@SVGElement.StrokeLinejoin.AsString()"
-              stroke-dasharray="@SVGElement.StrokeDasharray"
-              stroke-dashoffset="@SVGElement.StrokeDashoffset.AsString()"
-              fill="@SVGElement.Fill">
-            @foreach (BaseAnimate animate in SVGElement.AnimationElements)
-            {
-                var Parameters = new Dictionary<string, object> { { "SVGElement", animate } };
-                <DynamicComponent Type=animate.Presenter Parameters=Parameters />
-            }
-        </rect>
-    </g>
+   <rect @ref=ElementReference
+   @onfocusin="FocusElement"
+   @onfocusout="UnfocusElement"
+   @onpointerdown="SelectAsync"
+   @onkeyup="KeyUp"
+         tabindex="@(SVGElement.IsChildElement ? -1 : 0)"
+         x=@SVGElement.X.AsString()
+         y=@SVGElement.Y.AsString()
+         width=@SVGElement.Width.AsString()
+         height=@SVGElement.Height.AsString()
+         stroke="@SVGElement.Stroke"
+         stroke-width="@SVGElement.StrokeWidth"
+         stroke-linecap="@SVGElement.StrokeLinecap.AsString()"
+         stroke-linejoin="@SVGElement.StrokeLinejoin.AsString()"
+         stroke-dasharray="@SVGElement.StrokeDasharray"
+         stroke-dashoffset="@SVGElement.StrokeDashoffset.AsString()"
+         fill="@SVGElement.Fill">
+      @foreach (BaseAnimate animate in SVGElement.AnimationElements)
+      {
+            var Parameters = new Dictionary<string, object> { { "SVGElement", animate } };
+            <DynamicComponent Type=animate.Presenter Parameters=Parameters />
+      }
+   </rect>
     @if (SVGElement.Selected && SVGElement.SVG.EditMode is not EditMode.Add)
     {
         <Anchor OnPointerDown="() => AnchorSelect(0)" Position="(SVGElement.X, SVGElement.Y)" />
