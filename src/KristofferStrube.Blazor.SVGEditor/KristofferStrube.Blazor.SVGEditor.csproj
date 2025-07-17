@@ -42,7 +42,7 @@
     <PackageReference Include="Blazor.ContextMenu" Version="2.1.0" />
     <PackageReference Include="BlazorColorPicker" Version="4.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.16" />
-    <PackageReference Include="System.Reactive.Linq" Version="5.0.0" />
+    <PackageReference Include="System.Reactive.Linq" Version="6.0.1" />
     <PackageReference Include="KristofferStrube.Blazor.SVGAnimation" Version="0.2.0" />
   </ItemGroup>
 
