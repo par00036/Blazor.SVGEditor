@@ -260,7 +260,7 @@ public partial class SVGEditor : ComponentBase
         return SnapToInteger ? ((double x, double y))((int)res.x, (int)res.y) : res;
     }
 
-    private void ZoomIn(double x, double y, double ZoomFactor = 1.1, bool snapToNeutralScale = true)
+    protected void ZoomIn(double x, double y, double ZoomFactor = 1.1, bool snapToNeutralScale = true)
     {
         if (DisableZoom)
         {
@@ -280,7 +280,7 @@ public partial class SVGEditor : ComponentBase
         Translate = (Translate.x + ((x - Translate.x) * (1 - (Scale / prevScale))), Translate.y + ((y - Translate.y) * (1 - (Scale / prevScale))));
     }
 
-    private void ZoomOut(double x, double y, double ZoomFactor = 1.1, bool snapToNeutralScale = true)
+    protected void ZoomOut(double x, double y, double ZoomFactor = 1.1, bool snapToNeutralScale = true)
     {
         if (DisableZoom)
         {
