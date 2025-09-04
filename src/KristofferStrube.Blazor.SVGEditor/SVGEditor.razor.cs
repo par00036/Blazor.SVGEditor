@@ -145,7 +145,7 @@ public partial class SVGEditor : ComponentBase
         elementSubject.OnNext(SVGElement);
     }
 
-    public void SelectShape(Shape shape)
+    public virtual void SelectShape(Shape shape)
     {
         if (DisableSelecting)
         {
@@ -155,7 +155,7 @@ public partial class SVGEditor : ComponentBase
         SelectedShapes.Add(shape);
     }
 
-    public void ClearSelectedShapes()
+    public virtual void ClearSelectedShapes()
     {
         if (DisableDeselecting)
         {
