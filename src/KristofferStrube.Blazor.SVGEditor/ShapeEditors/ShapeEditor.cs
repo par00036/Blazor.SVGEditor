@@ -119,6 +119,7 @@ public abstract class ShapeEditor<TShape> : ComponentBase where TShape : Shape
                 SVGElement.SVG.ClearSelectedShapes();
                 SVGElement.SVG.SelectShape(SVGElement);
                 await SVGElement.SVG.FocusAsync(ElementReference);
+               
             }
             StateHasChanged();
             if (eventArgs.Button == 0)
