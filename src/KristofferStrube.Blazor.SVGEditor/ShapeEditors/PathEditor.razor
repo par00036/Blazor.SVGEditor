@@ -8,6 +8,7 @@
    @onpointerdown="SelectAsync"
    @onkeyup="KeyUp"
    @onselectstart:stopPropagation="true"
+   id="@SVGElement.Id"
          tabindex="@(SVGElement.IsChildElement ? -1 : 0)"
          d="@SVGElement.Instructions.AsString()"
          fill="@SVGElement.Fill"

@@ -6,6 +6,7 @@
    @onfocusout="UnfocusElement"
    @onpointerdown="SelectAsync"
    @onkeyup="KeyUp" tabindex="@(SVGElement.IsChildElement ? -1 : 0)"
+   id="@SVGElement.Id"
             cx=@SVGElement.Cx.AsString()
             cy=@SVGElement.Cy.AsString()
             r=@SVGElement.R.AsString()
