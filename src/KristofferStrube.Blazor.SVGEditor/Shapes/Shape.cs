@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Dom;
 using KristofferStrube.Blazor.SVGEditor.Extensions;
 using Microsoft.AspNetCore.Components.Web;
+using System.Text.RegularExpressions;
 using static System.Text.Json.JsonSerializer;
 
 namespace KristofferStrube.Blazor.SVGEditor;
@@ -88,6 +89,30 @@ public abstract class Shape : ISVGElement
 	{
 		get => Element.GetAttributeOrZero("stroke-dashoffset");
 		set { Element.SetAttribute("stroke-dashoffset", value.AsString()); Changed?.Invoke(this); }
+	}
+	public virtual double Rotation
+	{
+		get
+		{
+			var transform = Element.GetAttributeOrEmpty("transform");
+			if (string.IsNullOrEmpty(transform))
+				return 0;
+
+			var match = Regex.Match(transform, @"rotate\s*\(\s*([^,\s)]+)");
+			if (match.Success && double.TryParse(match.Groups[1].Value, out double angle))
+			{
+				return angle;
+			}
+			return 0;
+		}
+		set
+		{
+			//default the rotation to the top left of the bounding box; let children override this if they want a different rotation point
+			var insPtX = BoundingBox.X;
+			var insPtY = BoundingBox.Y;
+			Element.SetAttribute("transform", $"rotate({value} {insPtX} {insPtY})");
+			Changed?.Invoke(this);
+		}
 	}
 	public List<BaseAnimate> AnimationElements { get; set; }
 	public bool HasAnimation => AnimationElements is { Count: > 0 };
