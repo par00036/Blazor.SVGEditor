@@ -5,155 +5,161 @@ namespace KristofferStrube.Blazor.SVGEditor.ShapeEditors;
 
 public abstract class ShapeEditor<TShape> : ComponentBase where TShape : Shape
 {
-    [Parameter]
-    public required TShape SVGElement { get; set; }
+	[Parameter]
+	public required TShape SVGElement { get; set; }
 
-    public ElementReference ElementReference { get; set; }
+	public ElementReference ElementReference { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (SVGElement.Selected || firstRender)
-        {
-            Box BBox = await SVGElement.SVG.GetBoundingBox(ElementReference);
-            (double x, double y) = SVGElement.SVG.LocalDetransform((BBox.X - SVGElement.SVG.BBox.X, BBox.Y - SVGElement.SVG.BBox.Y));
-            SVGElement.BoundingBox = new Box()
-            {
-                X = x,
-                Y = y,
-                Height = BBox.Height / SVGElement.SVG.Scale,
-                Width = BBox.Width / SVGElement.SVG.Scale
-            };
-        }
-    }
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (SVGElement.SVG.BBox == null) return;
 
-    public void FocusElement()
-    {
-        if (SVGElement.IsChildElement)
-        {
-            return;
-        }
+		if (SVGElement.Selected || firstRender)
+		{
+			Box BBox = await SVGElement.SVG.GetBoundingBox(ElementReference);
+			//Console.WriteLine("Element BBox: " + BBox.X + ", " + BBox.Y + ", " + BBox.Width + ", " + BBox.Height);
+			(double x, double y) = SVGElement.SVG.LocalDetransform((BBox.X - SVGElement.SVG.BBox.X, BBox.Y - SVGElement.SVG.BBox.Y));
+			//var svgbox = SVGElement.SVG.LocalDetransform((BBox.X, BBox.Y));
+			//Console.WriteLine("svgbox : " + svgbox.x + ", " + svgbox.y);
+			SVGElement.BoundingBox = new Box()
+			{
+				X = x,
+				Y = y,
+				Height = BBox.Height / SVGElement.SVG.Scale,
+				Width = BBox.Width / SVGElement.SVG.Scale
+			};
+			//Console.WriteLine("Element New BBox: " + SVGElement.BoundingBox.X + ", " + SVGElement.BoundingBox.Y + ", " + SVGElement.BoundingBox.Width + ", " + SVGElement.BoundingBox.Height);
+		}
+	}
 
-        if (SVGElement.SVG.EditMode is EditMode.Add)
-        {
-            return;
-        }
+	public void FocusElement()
+	{
+		if (SVGElement.IsChildElement)
+		{
+			return;
+		}
 
-        SVGElement.SVG.FocusShape(SVGElement);
-    }
+		if (SVGElement.SVG.EditMode is EditMode.Add)
+		{
+			return;
+		}
 
-    public void UnfocusElement()
-    {
-        SVGElement.SVG.UnfocusShape();
-    }
+		SVGElement.SVG.FocusShape(SVGElement);
+	}
 
-    public async Task KeyUp(KeyboardEventArgs eventArgs)
-    {
-        if (SVGElement.IsChildElement)
-        {
-            return;
-        }
+	public void UnfocusElement()
+	{
+		SVGElement.SVG.UnfocusShape();
+	}
 
-        if (eventArgs.CtrlKey)
-        {
-            if (!SVGElement.SVG.DisableCopyElement && eventArgs.Key == "c")
-            {
-                await SVGElement.SVG.CopyElementsAsync();
-            }
-            else if (!SVGElement.SVG.DisablePasteElement && eventArgs.Key == "v")
-            {
-                await SVGElement.SVG.PasteElementsAsync(SVGElement);
-            }
-        }
-        else
-        {
-            if (!SVGElement.SVG.DisableRemoveElement && eventArgs.Key == "Delete")
-            {
-                SVGElement.SVG.Remove();
-            }
-        }
-    }
+	public async Task KeyUp(KeyboardEventArgs eventArgs)
+	{
+		if (SVGElement.IsChildElement)
+		{
+			return;
+		}
 
-    public void AnchorSelect(int anchor)
-    {
-        SVGElement.SVG.CurrentEditShape = SVGElement;
-        SVGElement.SVG.CurrentAnchor = anchor;
-        SVGElement.SVG.EditMode = EditMode.MoveAnchor;
-    }
+		if (eventArgs.CtrlKey)
+		{
+			if (!SVGElement.SVG.DisableCopyElement && eventArgs.Key == "c")
+			{
+				await SVGElement.SVG.CopyElementsAsync();
+			}
+			else if (!SVGElement.SVG.DisablePasteElement && eventArgs.Key == "v")
+			{
+				await SVGElement.SVG.PasteElementsAsync(SVGElement);
+			}
+		}
+		else
+		{
+			if (!SVGElement.SVG.DisableRemoveElement && eventArgs.Key == "Delete")
+			{
+				SVGElement.SVG.Remove();
+			}
+		}
+	}
 
-    public async Task SelectAsync(MouseEventArgs eventArgs)
-    {
-        if (SVGElement.IsChildElement)
-        {
-            return;
-        }
+	public void AnchorSelect(int anchor)
+	{
+		SVGElement.SVG.CurrentEditShape = SVGElement;
+		SVGElement.SVG.CurrentAnchor = anchor;
+		SVGElement.SVG.EditMode = EditMode.MoveAnchor;
+	}
 
-        if (SVGElement.SVG.EditMode is EditMode.Add)
-        {
-            return;
-        }
+	public virtual async Task SelectAsync(MouseEventArgs eventArgs)
+	{
+		if (SVGElement.IsChildElement)
+		{
+			return;
+		}
 
-        if (SVGElement.SVG.DisableSelecting && !SVGElement.Selected)
-        {
-            if (!SVGElement.SVG.DisableDeselecting)
-            {
-                SVGElement.SVG.UnSelect(eventArgs);
-            }
-            return;
-        }
+		if (SVGElement.SVG.EditMode is EditMode.Add)
+		{
+			return;
+		}
 
-        if (eventArgs.CtrlKey)
-        {
-            if (!SVGElement.Selected)
-            {
-                SVGElement.SVG.SelectShape(SVGElement);
-                await SVGElement.SVG.FocusAsync(ElementReference);
-            }
-            SVGElement.SVG.EditMode = EditMode.None;
-        }
-        else
-        {
-            SVGElement.SVG.MovePanner = SVGElement.SVG.LocalDetransform((eventArgs.OffsetX, eventArgs.OffsetY));
-            if (!SVGElement.Selected)
-            {
-                SVGElement.SVG.EditMode = EditMode.Move;
-                SVGElement.SVG.ClearSelectedShapes();
-                SVGElement.SVG.SelectShape(SVGElement);
-                await SVGElement.SVG.FocusAsync(ElementReference);
-               
-            }
-            StateHasChanged();
-            if (eventArgs.Button == 0)
-            {
-                switch (SVGElement.SVG.EditMode)
-                {
-                    case EditMode.None:
-                        SVGElement.SVG.EditMode = EditMode.Move;
-                        break;
-                    case EditMode.Scale:
-                        SVGElement.SVG.CurrentAnchor = -1;
-                        break;
-                    case EditMode.Add:
-                        break;
-                    case EditMode.Move:
-                        break;
-                    case EditMode.MoveAnchor:
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
+		if (SVGElement.SVG.DisableSelecting && !SVGElement.Selected)
+		{
+			if (!SVGElement.SVG.DisableDeselecting)
+			{
+				SVGElement.SVG.UnSelect(eventArgs);
+			}
+			return;
+		}
 
-    protected override bool ShouldRender()
-    {
-        string StateRepresentation = SVGElement.StateRepresentation;
-        if (SVGElement._stateRepresentation != StateRepresentation)
-        {
-            SVGElement._stateRepresentation = StateRepresentation;
-            StateHasChanged();
-            return true;
-        }
-        return false;
-    }
+		if (eventArgs.CtrlKey)
+		{
+			if (!SVGElement.Selected)
+			{
+				SVGElement.SVG.SelectShape(SVGElement);
+				await SVGElement.SVG.FocusAsync(ElementReference);
+			}
+			SVGElement.SVG.EditMode = EditMode.None;
+		}
+		else
+		{
+			SVGElement.SVG.MovePanner = SVGElement.SVG.LocalDetransform((eventArgs.OffsetX, eventArgs.OffsetY));
+			if (!SVGElement.Selected)
+			{
+				SVGElement.SVG.EditMode = EditMode.Move;
+				SVGElement.SVG.ClearSelectedShapes();
+				SVGElement.SVG.SelectShape(SVGElement);
+				await SVGElement.SVG.FocusAsync(ElementReference);
+
+			}
+			StateHasChanged();
+			if (eventArgs.Button == 0)
+			{
+				switch (SVGElement.SVG.EditMode)
+				{
+					case EditMode.None:
+						SVGElement.SVG.EditMode = EditMode.Move;
+						break;
+					case EditMode.Scale:
+						SVGElement.SVG.CurrentAnchor = -1;
+						break;
+					case EditMode.Add:
+						break;
+					case EditMode.Move:
+						break;
+					case EditMode.MoveAnchor:
+						break;
+					default:
+						break;
+				}
+			}
+		}
+	}
+
+	protected override bool ShouldRender()
+	{
+		string StateRepresentation = SVGElement.StateRepresentation;
+		if (SVGElement._stateRepresentation != StateRepresentation)
+		{
+			SVGElement._stateRepresentation = StateRepresentation;
+			StateHasChanged();
+			return true;
+		}
+		return false;
+	}
 }

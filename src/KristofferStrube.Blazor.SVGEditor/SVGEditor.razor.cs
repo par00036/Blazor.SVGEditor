@@ -11,7 +11,7 @@ namespace KristofferStrube.Blazor.SVGEditor;
 public partial class SVGEditor : ComponentBase
 {
 	private string? input;
-	private ElementReference svgElementReference;
+	protected ElementReference svgElementReference;
 	private List<Shape>? colorPickerShapes;
 	private string? colorPickerAttributeName;
 	private Action<string>? colorPickerSetter;
