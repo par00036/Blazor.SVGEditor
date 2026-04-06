@@ -5,6 +5,8 @@ namespace KristofferStrube.Blazor.SVGEditor;
 
 public partial class SVGEditor : IAsyncDisposable
 {
+	protected bool _disposed;
+
 	[Inject]
 	public required IJSRuntime JSRuntime { get; set; }
 
@@ -41,17 +43,23 @@ public partial class SVGEditor : IAsyncDisposable
 
 	public async Task<Box> GetBoundingBox(ElementReference elementReference)
 	{
+		if (_disposed) return null!;
+
 		IJSObjectReference module = await moduleTask.Value;
 		return await module.InvokeAsync<Box>("BBox", elementReference);
 	}
 
 	public virtual async ValueTask DisposeAsync()
 	{
+		if (_disposed) return;
+
 		if (moduleTask.IsValueCreated)
 		{
 			IJSObjectReference module = await moduleTask.Value;
 			await module.DisposeAsync();
 		}
 		GC.SuppressFinalize(this);
+
+		_disposed = true;
 	}
 }
