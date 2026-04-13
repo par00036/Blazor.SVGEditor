@@ -110,10 +110,53 @@ public abstract class Shape : ISVGElement
 			//default the rotation to the top left of the bounding box; let children override this if they want a different rotation point
 			var insPtX = BoundingBox.X;
 			var insPtY = BoundingBox.Y;
-			Element.SetAttribute("transform", $"rotate({value} {insPtX} {insPtY})");
+			var transform = Element.GetAttributeOrEmpty("transform");
+			var rotateStr = $"rotate({value} {insPtX} {insPtY})";
+			if (Regex.IsMatch(transform, @"rotate\s*\("))
+			{
+				transform = Regex.Replace(transform, @"rotate\s*\([^)]*\)", rotateStr);
+			}
+			else
+			{
+				transform = string.IsNullOrEmpty(transform) ? rotateStr : $"{transform} {rotateStr}";
+			}
+			Element.SetAttribute("transform", transform);
 			Changed?.Invoke(this);
 		}
 	}
+
+	public virtual double Scale
+	{
+		get
+		{
+			var transform = Element.GetAttributeOrEmpty("transform");
+			if (string.IsNullOrEmpty(transform))
+				return 1;
+
+			var match = Regex.Match(transform, @"scale\s*\(\s*([^,\s)]+)");
+			if (match.Success && double.TryParse(match.Groups[1].Value, out double scale))
+			{
+				return scale;
+			}
+			return 1;
+		}
+		set
+		{
+			var transform = Element.GetAttributeOrEmpty("transform");
+			var scaleStr = $"scale({value.AsString()})";
+			if (Regex.IsMatch(transform, @"scale\s*\("))
+			{
+				transform = Regex.Replace(transform, @"scale\s*\([^)]*\)", scaleStr);
+			}
+			else
+			{
+				transform = string.IsNullOrEmpty(transform) ? scaleStr : $"{transform} {scaleStr}";
+			}
+			Element.SetAttribute("transform", transform);
+			Changed?.Invoke(this);
+		}
+	}
+
 	public List<BaseAnimate> AnimationElements { get; set; }
 	public bool HasAnimation => AnimationElements is { Count: > 0 };
 	public Box BoundingBox { get; set; } = new();
