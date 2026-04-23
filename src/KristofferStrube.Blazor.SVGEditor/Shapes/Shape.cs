@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Dom;
 using KristofferStrube.Blazor.SVGEditor.Extensions;
 using Microsoft.AspNetCore.Components.Web;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using static System.Text.Json.JsonSerializer;
 
@@ -90,20 +91,20 @@ public abstract class Shape : ISVGElement
 		get => Element.GetAttributeOrZero("stroke-dashoffset");
 		set { Element.SetAttribute("stroke-dashoffset", value.AsString()); Changed?.Invoke(this); }
 	}
-	public virtual double Rotation
+	public virtual decimal Rotation
 	{
 		get
 		{
 			var transform = Element.GetAttributeOrEmpty("transform");
 			if (string.IsNullOrEmpty(transform))
-				return 0;
+				return 0m;
 
 			var match = Regex.Match(transform, @"rotate\s*\(\s*([^,\s)]+)");
-			if (match.Success && double.TryParse(match.Groups[1].Value, out double angle))
+			if (match.Success && decimal.TryParse(match.Groups[1].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal angle))
 			{
 				return angle;
 			}
-			return 0;
+			return 0m;
 		}
 		set
 		{
@@ -111,7 +112,7 @@ public abstract class Shape : ISVGElement
 			var insPtX = BoundingBox.X;
 			var insPtY = BoundingBox.Y;
 			var transform = Element.GetAttributeOrEmpty("transform");
-			var rotateStr = $"rotate({value} {insPtX} {insPtY})";
+			var rotateStr = $"rotate({value.ToString(CultureInfo.InvariantCulture)} {insPtX} {insPtY})";
 			if (Regex.IsMatch(transform, @"rotate\s*\("))
 			{
 				transform = Regex.Replace(transform, @"rotate\s*\([^)]*\)", rotateStr);
@@ -119,38 +120,6 @@ public abstract class Shape : ISVGElement
 			else
 			{
 				transform = string.IsNullOrEmpty(transform) ? rotateStr : $"{transform} {rotateStr}";
-			}
-			Element.SetAttribute("transform", transform);
-			Changed?.Invoke(this);
-		}
-	}
-
-	public virtual double Scale
-	{
-		get
-		{
-			var transform = Element.GetAttributeOrEmpty("transform");
-			if (string.IsNullOrEmpty(transform))
-				return 1;
-
-			var match = Regex.Match(transform, @"scale\s*\(\s*([^,\s)]+)");
-			if (match.Success && double.TryParse(match.Groups[1].Value, out double scale))
-			{
-				return scale;
-			}
-			return 1;
-		}
-		set
-		{
-			var transform = Element.GetAttributeOrEmpty("transform");
-			var scaleStr = $"scale({value.AsString()})";
-			if (Regex.IsMatch(transform, @"scale\s*\("))
-			{
-				transform = Regex.Replace(transform, @"scale\s*\([^)]*\)", scaleStr);
-			}
-			else
-			{
-				transform = string.IsNullOrEmpty(transform) ? scaleStr : $"{transform} {scaleStr}";
 			}
 			Element.SetAttribute("transform", transform);
 			Changed?.Invoke(this);

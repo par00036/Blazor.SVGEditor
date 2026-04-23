@@ -259,10 +259,21 @@ public partial class SVGEditor : ComponentBase
 		return ((pos.x * Scale) + Translate.x, (pos.y * Scale) + Translate.y);
 	}
 
+	public (decimal x, decimal y) LocalTransform((decimal x, decimal y) pos)
+	{
+		return (((decimal)pos.x * (decimal)Scale) + (decimal)Translate.x, ((decimal)pos.y * (decimal)Scale) + (decimal)Translate.y);
+	}
+
 	public (double x, double y) LocalDetransform((double x, double y) pos)
 	{
 		(double x, double y) res = (x: (pos.x - Translate.x) / Scale, y: (pos.y - Translate.y) / Scale);
 		return SnapToInteger ? ((double x, double y))((int)res.x, (int)res.y) : res;
+	}
+
+	public (decimal x, decimal y) LocalDetransform((decimal x, decimal y) pos)
+	{
+		(decimal x, decimal y) res = (x: (pos.x - (decimal)Translate.x) / (decimal)Scale, y: (pos.y - (decimal)Translate.y) / (decimal)Scale);
+		return SnapToInteger ? ((decimal x, decimal y))((int)res.x, (int)res.y) : res;
 	}
 
 	protected void ZoomIn(double x, double y, double ZoomFactor = 1.1, bool snapToNeutralScale = true)

@@ -28,7 +28,7 @@ public abstract class ShapeEditor<TShape> : ComponentBase where TShape : Shape
 				Height = BBox.Height / SVGElement.SVG.Scale,
 				Width = BBox.Width / SVGElement.SVG.Scale
 			};
-			//Console.WriteLine("Element New BBox: " + SVGElement.BoundingBox.X + ", " + SVGElement.BoundingBox.Y + ", " + SVGElement.BoundingBox.Width + ", " + SVGElement.BoundingBox.Height);
+			Console.WriteLine("Element New BBox: " + SVGElement.BoundingBox.X + ", " + SVGElement.BoundingBox.Y + ", " + SVGElement.BoundingBox.Width + ", " + SVGElement.BoundingBox.Height);
 		}
 	}
 
